@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Jobs\ProductCreatedJob;
+use App\Jobs\ProductDeletedJob;
+use App\Jobs\ProductUpdatedJob;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -21,7 +23,7 @@ class ProductsController extends Controller
         $product = Product::create($request->only('title', 'image'));
 
         ProductCreatedJob::dispatch($product->toArray());
-        // ->onQueue('app_queue');
+
 
         return response($product, Response::HTTP_CREATED);
     }
@@ -32,7 +34,7 @@ class ProductsController extends Controller
 
         $product->update($request->only('title', 'image'));
 
-            // ProductUpdated::dispatch($product->toArray())->onQueue('app_queue');
+        ProductUpdatedJob::dispatch($product->toArray());
 
 
         return response($product, Response::HTTP_ACCEPTED);
@@ -42,7 +44,7 @@ class ProductsController extends Controller
     {
         Product::destroy($id);
 
-        // ProductDeleted::dispatch($id)->onQueue('app_queue');
+        ProductDeletedJob::dispatch($id);
 
         return response(null, Response::HTTP_NO_CONTENT);
     }
